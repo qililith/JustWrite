@@ -28,9 +28,16 @@ TipTap 只允许：
 
 - 选区设标题：转换整个块，不是给几个字套 heading 样式。
 - 章节聚焦：CSS / decoration 隐藏范围外节点，不改 JSON。
-- 无干扰全屏与章节聚焦可叠加。监听 `fullscreenchange`，避免残态。
+- 无干扰全屏与章节聚焦可叠加。网页监听 `fullscreenchange`、桌面监听窗口全屏状态，避免残态。
 - `Esc`：工具条 → 退出聚焦 → 退出全屏。
 - 界面中文。设计 token 用 `docs/DESIGN.md`：纯黑白中性灰阶，除 Highlight 淡黄与删除/错误红外不要引入带色相的颜色，也不要做成工具栏堆叠的后台风。
+
+## 桌面版
+
+- 网页版与桌面版共用同一套前端。桌面差异只经 `src/platform/desktop.ts` 的 `isDesktop()` 分支，`@tauri-apps/*` 只能在 `src/platform/` 里 import（且用动态 import）。
+- 桌面版不加网页版没有的功能。
+- Rust 写盘命令只允许 `manifest.json` 与 `docs/{id}.json`，不要放宽成任意路径。
+- 改动后网页版 `npm run build` 必须照常通过、线上行为不变。
 
 ## 长目录
 

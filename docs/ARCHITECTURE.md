@@ -69,6 +69,8 @@ text marks   → bold | highlight
 
 监听 `fullscreenchange`：若 `document.fullscreenElement === null` 且 `isZen`，则 `isZen = false`。
 
+桌面版第 2 步改为 `getCurrentWindow().setFullscreen(true)`，并用窗口 resize 后的 `isFullscreen()` 代替 `fullscreenchange`（只在状态翻转时同步，忽略切换过程中的中间 resize）。
+
 ## 存储
 
 - IndexedDB 库名 `changwen`，store：`documents`、`meta`
@@ -85,6 +87,11 @@ text marks   → bold | highlight
 - 每次保存只写改动的文档与 manifest；软删除的文档从 `docs/` 移除
 - 启动和自动保存只查询权限，不弹窗；`requestPermission` 只在用户点「重新允许访问文件夹」时调用
 - 不支持 File System Access 的浏览器：侧栏改为「导出当前文档 / 导入文档」（JSON）
+- `folder.ts` 把文件夹抽象成 `FolderTarget`（`writeText / remove / hasPermission`）：网页版背后是目录句柄（`meta.folderHandle`），桌面版背后是磁盘路径（`meta.folderPath`），经 Rust 命令 `folder_write / folder_remove` 原子写入；路径不存在时侧栏显示「文件夹不可用，重新选择」
+
+## 桌面壳
+
+`src-tauri/`：Tauri 2。插件：single-instance（再次启动只聚焦已有窗口）、window-state（记住位置大小，不记全屏）、dialog（目录选择）。关窗走 `onCloseRequested`，先 `flushPendingSave()` 把 400ms debounce 里的正文写完再销毁窗口。非输入区域屏蔽 WebView 默认右键菜单。
 
 ## 标题聚焦入口
 
@@ -105,6 +112,7 @@ text marks   → bold | highlight
 | 目录 | 职责 |
 | --- | --- |
 | `src/storage` | IndexedDB、文件夹读写，无 UI |
+| `src/platform` | 桌面版（Tauri）调用：目录选择、写盘、窗口全屏、关窗 |
 | `src/features/editor` | TipTap 扩展、气泡、heading id |
 | `src/features/outline` | 抽取、虚拟列表、滚动联动 |
 | `src/features/focus` | 范围计算、隐藏 decoration |

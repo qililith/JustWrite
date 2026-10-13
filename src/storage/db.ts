@@ -119,6 +119,31 @@ export async function getFolderHandle(): Promise<FileSystemDirectoryHandle | nul
   }
 }
 
+let memoryPath: string | null = null;
+
+export async function getFolderPath(): Promise<string | null> {
+  try {
+    const db = await getDb();
+    const path = await db.get("meta", "folderPath");
+    return typeof path === "string" ? path : null;
+  } catch {
+    useMemory = true;
+    return memoryPath;
+  }
+}
+
+export async function putFolderPath(path: string | null): Promise<void> {
+  memoryPath = path;
+  try {
+    if (useMemory) return;
+    const db = await getDb();
+    if (path) await db.put("meta", path, "folderPath");
+    else await db.delete("meta", "folderPath");
+  } catch {
+    useMemory = true;
+  }
+}
+
 export async function putFolderHandle(
   handle: FileSystemDirectoryHandle | null,
 ): Promise<void> {

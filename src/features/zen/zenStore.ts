@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { isDesktop, setWindowFullscreen } from "@/platform/desktop";
 
 type ZenState = {
   isZen: boolean;
@@ -6,7 +7,11 @@ type ZenState = {
   toggleZen: () => void;
 };
 
-async function requestBrowserFullscreen() {
+async function enterFullscreen() {
+  if (isDesktop()) {
+    await setWindowFullscreen(true).catch(() => undefined);
+    return;
+  }
   const root = document.documentElement;
   if (!document.fullscreenElement && root.requestFullscreen) {
     try {
@@ -17,7 +22,11 @@ async function requestBrowserFullscreen() {
   }
 }
 
-async function exitBrowserFullscreen() {
+async function exitFullscreen() {
+  if (isDesktop()) {
+    await setWindowFullscreen(false).catch(() => undefined);
+    return;
+  }
   if (document.fullscreenElement && document.exitFullscreen) {
     try {
       await document.exitFullscreen();
@@ -33,16 +42,16 @@ export const useZenStore = create<ZenState>((set, get) => ({
     set({ isZen: value });
     document.documentElement.dataset.zen = value ? "true" : "false";
     document.documentElement.classList.toggle("is-zen", value);
-    if (value) void requestBrowserFullscreen();
-    else void exitBrowserFullscreen();
+    if (value) void enterFullscreen();
+    else void exitFullscreen();
   },
   toggleZen: () => {
     get().setZen(!get().isZen);
   },
 }));
 
-export function syncZenWithFullscreen() {
-  const isFull = Boolean(document.fullscreenElement);
+/** 全屏被外部改变（浏览器 Esc、系统快捷键）时让 zen 跟上。 */
+export function syncZenWithFullscreen(isFull = Boolean(document.fullscreenElement)) {
   const { isZen, setZen } = useZenStore.getState();
   if (!isFull && isZen) {
     document.documentElement.dataset.zen = "false";

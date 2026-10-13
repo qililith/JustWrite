@@ -72,6 +72,23 @@ npm run deploy       # 构建并上传 dist
 - 启用云同步后，要在 Supabase → Authentication → URL Configuration 里把线上地址加进 Site URL / Redirect URLs，否则确认邮件会跳回 localhost。
 - 需要代理才能访问 Cloudflare 时，先设 `HTTPS_PROXY`，wrangler 会自动使用。
 
+### 桌面版（Tauri 2，Windows）
+
+同一套前端，套 Tauri 壳。首次需要 [Rust](https://rustup.rs)（stable MSVC）与 VS 2022 Build Tools「使用 C++ 的桌面开发」；WebView2 系统自带。
+
+```bash
+npm run desktop:dev     # 开发：起 Vite 并打开桌面窗口
+npm run desktop:build   # 打包：src-tauri/target/release/bundle/nsis/长文_*_x64-setup.exe
+```
+
+与网页版的差别只在 `src/platform/desktop.ts` 这一层：
+
+- 文稿仍存 IndexedDB（在应用自己的数据目录，清浏览器数据不影响）。
+- 绑定文件夹用系统目录选择框，路径存 `meta.folderPath`，由 Rust 命令写盘，没有授权弹窗。
+- 无干扰全屏用窗口原生全屏，没有浏览器提示条，Esc 分层完全由应用控制。
+- 关窗前先写入尚未保存的正文；只允许运行一个实例。
+- 中文字体走 Google Fonts，离线时回退到系统黑体。
+
 ## 技术栈
 
 - Vite + React + TypeScript
@@ -105,6 +122,8 @@ src/features/word-count/  # 计数
 src/features/auth/        # 登录注册
 src/features/sync/        # 推拉与状态
 src/storage/              # IndexedDB + 文件夹绑定
+src/platform/             # 桌面版（Tauri）专用调用，唯一允许 import @tauri-apps 的地方
+src-tauri/                # Tauri 壳：窗口、打包、写盘命令
 src/shared/theme/         # CSS 变量
 ```
 

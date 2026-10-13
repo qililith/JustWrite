@@ -15,7 +15,8 @@ import { useSyncStore } from "@/features/sync/syncStore";
 import { ConfirmDialog } from "@/shared/ui/ConfirmDialog";
 import { downloadDocument } from "@/storage/folder";
 import type { DocumentRecord } from "@/storage/types";
-import { applyBlockLevel } from "@/features/editor/editorRegistry";
+import { applyBlockLevel, flushPendingSave } from "@/features/editor/editorRegistry";
+import { isDesktop, onWindowClose, onWindowFullscreenChange } from "@/platform/desktop";
 
 export function App() {
   const ready = useWorkspaceStore((s) => s.ready);
@@ -46,6 +47,20 @@ export function App() {
   }, [hydrate, hydrateAuth]);
 
   useEffect(() => {
+    if (isDesktop()) {
+      const stopFull = onWindowFullscreenChange((isFull) => syncZenWithFullscreen(isFull));
+      const stopClose = onWindowClose(flushPendingSave);
+      const onContextMenu = (event: MouseEvent) => {
+        const target = event.target as HTMLElement | null;
+        if (!target?.closest("input, textarea, [contenteditable='true']")) event.preventDefault();
+      };
+      document.addEventListener("contextmenu", onContextMenu);
+      return () => {
+        void stopFull.then((stop) => stop());
+        void stopClose.then((stop) => stop());
+        document.removeEventListener("contextmenu", onContextMenu);
+      };
+    }
     const onFull = () => syncZenWithFullscreen();
     document.addEventListener("fullscreenchange", onFull);
     return () => document.removeEventListener("fullscreenchange", onFull);
@@ -162,9 +177,15 @@ export function App() {
         <div className="sidebar-footer">
           {folder.supported ? (
             folder.needsPermission ? (
-              <button type="button" className="linkish" onClick={() => void grantFolder()}>
-                重新允许访问文件夹
-              </button>
+              isDesktop() ? (
+                <button type="button" className="linkish" onClick={() => void bindFolder()}>
+                  文件夹不可用，重新选择
+                </button>
+              ) : (
+                <button type="button" className="linkish" onClick={() => void grantFolder()}>
+                  重新允许访问文件夹
+                </button>
+              )
             ) : (
               <button type="button" className="linkish" onClick={() => void bindFolder()}>
                 {folder.bound ? `已绑定：${folder.name}` : "绑定文件夹"}

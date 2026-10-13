@@ -59,3 +59,27 @@
 ## 阶段 9 — 收束
 
 验收主路径：建文档 → 写标题与正文 → 设级 / 加粗 / 高亮 → 目录跳转 → 章节聚焦 → 无干扰全屏（热区、Esc）→ 刷新恢复 → 绑文件夹（若浏览器支持）→ 登录入口可见。对照「不做」清单，没有多余功能。
+
+## 阶段 10 — 桌面版（Tauri 2，Windows，自用）
+
+只是换个壳，不加功能。同一套前端代码，网页版行为不变。
+
+文件：`src-tauri/`、`src/platform/`，以及 `src/storage/folder.ts`、`src/storage/repository.ts`、`src/features/zen/zenStore.ts`、`src/app/App.tsx` 里的平台分支。
+
+1. 环境：rustup（stable MSVC）+ VS 2022 Build Tools「使用 C++ 的桌面开发」。WebView2 系统自带。
+2. 脚手架：`@tauri-apps/cli` v2，`src-tauri/` 内 productName `长文`、identifier `app.changwen.desktop`、窗口 1280×820（最小 900×600）、打包 NSIS 当前用户安装（不要管理员）、简体中文安装界面。
+3. 平台判定：`src/platform/desktop.ts` 导出 `isDesktop()`，所有桌面分支只经它判断；`@tauri-apps/*` 只在 `src/platform/` 内 import。
+4. 文件夹：桌面用系统目录选择框，路径存 IndexedDB `meta` 键 `folderPath`；写盘走 Rust 命令 `folder_write` / `folder_remove`，只允许 `manifest.json` 与 `docs/{id}.json`。没有权限弹窗。目录结构与网页版一致。
+5. 全屏：桌面用窗口原生全屏（`setFullscreen`），不用浏览器 Fullscreen API；靠窗口 resize 事件同步 `isZen`。没有「按 Esc 退出全屏」提示，Esc 分层完全由应用控制。
+6. 关窗保存：关闭窗口前先把编辑器未落盘的内容写入 IndexedDB 与文件夹。
+7. 插件：单实例（再次打开只聚焦已有窗口）、记住窗口位置大小。
+8. 命令：`npm run desktop:dev`、`npm run desktop:build`；`.gitignore` 忽略 `src-tauri/target`。
+
+验收：
+
+- `npm run desktop:build` 产出安装包，安装后开始菜单有「长文」，无需管理员。
+- 桌面主路径同阶段 9；关窗再开内容还在；关窗前最后几个字没丢。
+- 绑定文件夹后磁盘出现 `manifest.json` 与 `docs/*.json`，重启后仍绑定且不弹任何授权。
+- 全屏无浏览器提示条；Esc 先关工具条、再退聚焦、最后退全屏；F11 / Ctrl+. 可切换。
+- 双击第二次只聚焦已开窗口。
+- 网页版 `npm run build` 与线上行为不变。

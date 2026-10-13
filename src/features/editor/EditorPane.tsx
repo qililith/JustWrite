@@ -9,7 +9,7 @@ import { useFocusStore } from "@/features/focus/focusStore";
 import { useOutlineStore } from "@/features/outline/outlineStore";
 import { sectionFocusKey } from "@/features/focus/SectionFocus";
 import { extractOutline } from "@/features/outline/extractOutline";
-import { setCurrentEditor } from "./editorRegistry";
+import { setCurrentEditor, setPendingSaveFlusher } from "./editorRegistry";
 
 function syncActiveHeading(doc: ProseNode, from: number) {
   const $from = doc.resolve(from);
@@ -70,6 +70,22 @@ export function EditorPane() {
     setCurrentEditor(editor);
     return () => setCurrentEditor(null);
   }, [editor]);
+
+  useEffect(() => {
+    if (!editor) return;
+    setPendingSaveFlusher(async () => {
+      const id = docIdRef.current;
+      if (!saveTimer.current || !id) return;
+      window.clearTimeout(saveTimer.current);
+      saveTimer.current = null;
+      const latest = editor.getJSON();
+      const serialized = JSON.stringify(latest);
+      if (serialized === lastSaved.current) return;
+      lastSaved.current = serialized;
+      await saveContent(id, latest);
+    });
+    return () => setPendingSaveFlusher(null);
+  }, [editor, saveContent]);
 
   useEffect(() => {
     if (!editor) return;

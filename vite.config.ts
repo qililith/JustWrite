@@ -15,6 +15,7 @@ export default defineConfig({
         manualChunks(id) {
           if (!id.includes("node_modules")) return undefined;
           if (id.includes("@supabase")) return "supabase";
+          if (id.includes("@tauri-apps")) return "desktop";
           if (id.includes("@tiptap") || id.includes("prosemirror")) return "editor";
           return "vendor";
         },

@@ -1,6 +1,16 @@
 import type { Editor } from "@tiptap/react";
 
 let current: Editor | null = null;
+let pendingSave: (() => Promise<void>) | null = null;
+
+export function setPendingSaveFlusher(flush: (() => Promise<void>) | null) {
+  pendingSave = flush;
+}
+
+/** 立即写入 debounce 中尚未保存的正文。 */
+export async function flushPendingSave() {
+  await pendingSave?.();
+}
 
 export function setCurrentEditor(editor: Editor | null) {
   current = editor;
