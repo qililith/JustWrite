@@ -59,6 +59,19 @@ npm run preview
 
 未配置环境变量时，应用照常运行，登录入口会提示「未配置云同步」。
 
+### 部署（Cloudflare Pages）
+
+线上地址：<https://longform-editor.pages.dev>（Pages 项目名 `longform-editor`，生产分支 `main`）。
+
+```bash
+npx wrangler login   # 首次
+npm run deploy       # 构建并上传 dist
+```
+
+- `VITE_SUPABASE_*` 在构建时写进产物，所以部署前本机 `.env` 里是什么，线上就是什么。改了 `.env` 要重新 `npm run deploy`。
+- 启用云同步后，要在 Supabase → Authentication → URL Configuration 里把线上地址加进 Site URL / Redirect URLs，否则确认邮件会跳回 localhost。
+- 需要代理才能访问 Cloudflare 时，先设 `HTTPS_PROXY`，wrangler 会自动使用。
+
 ## 技术栈
 
 - Vite + React + TypeScript
