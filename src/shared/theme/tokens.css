@@ -1,0 +1,91 @@
+:root {
+  --canvas: #ffffff;
+  --surface: #f7f7f7;
+  --surface-raised: #ffffff;
+  --ink: #111111;
+  --ink-soft: #2e2e2e;
+  --muted: #8c8c8c;
+  --line: #e6e6e6;
+  --hover: rgba(0, 0, 0, 0.04);
+  --accent: #111111;
+  --accent-soft: #ededed;
+  --highlight: #fff1a8;
+  --selection: #d4d4d4;
+  --focus-bar: #f3f3f3;
+  --danger: #b3261e;
+  --overlay: rgba(0, 0, 0, 0.24);
+  --toolbar-bg: #111111;
+  --toolbar-ink: #b8b8b8;
+  --radius: 12px;
+  --radius-item: 6px;
+  --radius-pill: 999px;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 10px 30px rgba(0, 0, 0, 0.08);
+  --font-sans: "Source Sans 3", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-heading: var(--font-sans);
+  --measure: 680px;
+  --sidebar: 272px;
+}
+
+::selection {
+  background: var(--selection);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #d0d0d0 transparent;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.is-idle.is-zen {
+  cursor: none;
+}
+
+.is-idle.is-zen button,
+.is-idle.is-zen input,
+.is-idle.is-zen .bubble-bar {
+  cursor: auto;
+}
