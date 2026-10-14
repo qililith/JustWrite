@@ -8,9 +8,14 @@ import { join, resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
 const bump = process.argv[2] ?? "patch";
-const UPDATES_PROJECT = "changwen-updates";
+const UPDATES_PROJECT = "justwrite-updates";
 const UPDATES_URL = `https://${UPDATES_PROJECT}.pages.dev`;
-const keyPath = process.env.TAURI_SIGNING_PRIVATE_KEY ?? join(homedir(), ".tauri", "changwen.key");
+const keyPath =
+  process.env.TAURI_SIGNING_PRIVATE_KEY ??
+  [join(homedir(), ".tauri", "justwrite.key"), join(homedir(), ".tauri", "changwen.key")].find((path) =>
+    existsSync(path),
+  ) ??
+  join(homedir(), ".tauri", "justwrite.key");
 
 function fail(message) {
   console.error(`\n发布中止：${message}`);
@@ -58,7 +63,7 @@ const signature = readFileSync(join(nsisDir, `${setup}.sig`), "utf8").trim();
 
 const releaseDir = join(root, "release");
 const staging = join(releaseDir, "updates");
-const fileName = `changwen_${version}_x64-setup.exe`;
+const fileName = `justwrite_${version}_x64-setup.exe`;
 rmSync(staging, { recursive: true, force: true });
 mkdirSync(staging, { recursive: true });
 copyFileSync(join(nsisDir, setup), join(staging, fileName));
@@ -87,7 +92,7 @@ const notesFile = join(staging, "notes.md");
 writeFileSync(notesFile, `${notes}\n`);
 try {
   run(
-    `gh release create v${version} "${join(staging, fileName)}" --title "长文 v${version}" --notes-file "${notesFile}"`,
+    `gh release create v${version} "${join(staging, fileName)}" --title "写文章 v${version}" --notes-file "${notesFile}"`,
   );
 } catch {
   console.warn("\nGitHub Release 创建失败（检查 gh 是否已登录）；更新源与网页已发布，不影响自动更新。");
@@ -95,6 +100,6 @@ try {
 rmSync(notesFile, { force: true });
 
 console.log(`\n已发布 v${version}`);
-console.log(`- 网页：https://longform-editor.pages.dev`);
+console.log(`- 网页：https://justwrite-cr0.pages.dev`);
 console.log(`- 更新源：${UPDATES_URL}/latest.json`);
 console.log(`- 安装包：${join(releaseDir, setup)}`);

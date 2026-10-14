@@ -61,7 +61,7 @@ npm run preview
 
 ### 部署（Cloudflare Pages）
 
-线上地址：<https://justwrite.pages.dev>（Pages 项目名 `justwrite`，生产分支 `main`）。
+线上地址：<https://justwrite-cr0.pages.dev>（Pages 项目名 `justwrite`，生产分支 `main`）。
 
 ```bash
 npx wrangler login   # 首次
@@ -100,9 +100,9 @@ npm run release            # 0.1.0 → 0.1.1
 npm run release -- minor   # 0.1.x → 0.2.0
 ```
 
-`scripts/release.mjs` 依次：检查工作区干净且在 `main` → `npm version`（提交并打 `vX.Y.Z` 标签）→ `npm run deploy`（网页）→ 签名打包桌面安装包 → 把安装包与 `latest.json` 部署到 Cloudflare Pages 项目 `changwen-updates`（自动更新源）→ `git push --follow-tags` → `gh release create`（GitHub Release，留存安装包与更新说明，说明取自上个标签以来的提交标题）。
+`scripts/release.mjs` 依次：检查工作区干净且在 `main` → `npm version`（提交并打 `vX.Y.Z` 标签）→ `npm run deploy`（网页）→ 签名打包桌面安装包 → 把安装包与 `latest.json` 部署到 Cloudflare Pages 项目 `justwrite-updates`（自动更新源）→ `git push --follow-tags` → `gh release create`（GitHub Release，留存安装包与更新说明，说明取自上个标签以来的提交标题）。
 
-- 更新签名私钥在 `~/.tauri/changwen.key`，**不进仓库，务必备份**。丢了它，已安装的桌面版就再也收不到更新，只能手动重装。
+- 更新签名私钥在 `~/.tauri/justwrite.key`，**不进仓库，务必备份**。丢了它，已安装的桌面版就再也收不到更新，只能手动重装。若私钥仍在旧路径 `~/.tauri/changwen.key`，发布脚本会继续用它。
 - 更新源放在 Cloudflare 而不是 GitHub Releases：仓库是私有的，Releases 文件需要登录才能下载。
 - 已安装的桌面版点「重启更新」后，安装器以 passive 模式覆盖安装并重启应用；文稿在应用数据目录，不受影响。
 

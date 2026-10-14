@@ -53,7 +53,7 @@
   "plugins": {
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEE5QjYzNjg1MjlFRjEwOEIKUldTTEVPOHBoVGEycVR6ako2Wlo0RFdFRjV0bHBlYlU2V1VpSGlNR0J5aE1iQVRBUXBxRUxvK2MK",
-      "endpoints": ["https://changwen-updates.pages.dev/latest.json"],
+      "endpoints": ["https://justwrite-updates.pages.dev/latest.json"],
       "windows": {
         "installMode": "passive"
       }
