@@ -27,6 +27,19 @@ function run(cmd, env = {}) {
   execSync(cmd, { cwd: root, stdio: "inherit", env: { ...process.env, ...env } });
 }
 
+function runWithRetry(cmd, attempts = 3) {
+  for (let i = 1; ; i += 1) {
+    try {
+      run(cmd);
+      return;
+    } catch (error) {
+      if (i >= attempts) throw error;
+      console.warn(`\n第 ${i} 次失败，5 秒后重试…`);
+      execSync(process.platform === "win32" ? "timeout /t 5 /nobreak >nul" : "sleep 5");
+    }
+  }
+}
+
 function out(cmd) {
   return execSync(cmd, { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
 }
@@ -82,16 +95,16 @@ writeFileSync(
   )}\n`,
 );
 writeFileSync(join(staging, "_headers"), "/latest.json\n  Cache-Control: no-cache\n");
-run(
+runWithRetry(
   `npx --yes wrangler@4 pages deploy "${staging}" --project-name ${UPDATES_PROJECT} --branch main --commit-dirty=true`,
 );
 
-run("git push --follow-tags");
+runWithRetry("git push --follow-tags");
 
 const notesFile = join(staging, "notes.md");
 writeFileSync(notesFile, `${notes}\n`);
 try {
-  run(
+  runWithRetry(
     `gh release create v${version} "${join(staging, fileName)}" --title "写文章 v${version}" --notes-file "${notesFile}"`,
   );
 } catch {
