@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useVisibleDocuments, useWorkspaceStore } from "./workspaceStore";
 import { displayTitle } from "@/shared/lib/text";
+import { Icon } from "@/shared/ui/Icon";
 
 type Props = {
   onAskDelete: (id: string, title: string) => void;
@@ -26,11 +27,23 @@ export function DocumentList({ onAskDelete }: Props) {
   return (
     <>
       <div className="section-label">
-        <button type="button" className="linkish" onClick={() => setDocsOpen(!docsOpen)}>
-          文档 {docsOpen ? "▾" : "▸"}
+        <button
+          type="button"
+          className="linkish section-toggle"
+          aria-expanded={docsOpen}
+          onClick={() => setDocsOpen(!docsOpen)}
+        >
+          文档
+          <Icon name={docsOpen ? "chevron-down" : "chevron-right"} size={12} />
         </button>
-        <button type="button" className="icon-btn" onClick={() => void createDocument()}>
-          +
+        <button
+          type="button"
+          className="icon-btn icon-only"
+          aria-label="新建文档"
+          title="新建文档"
+          onClick={() => void createDocument()}
+        >
+          <Icon name="plus" size={14} />
         </button>
       </div>
       {docsOpen ? (
@@ -78,19 +91,23 @@ export function DocumentList({ onAskDelete }: Props) {
                 <button
                   type="button"
                   className="item-action"
+                  aria-label="重命名"
+                  title="重命名"
                   onClick={() => {
                     setEditingId(doc.id);
                     setDraft(title);
                   }}
                 >
-                  改
+                  <Icon name="pencil" size={14} />
                 </button>
                 <button
                   type="button"
                   className="item-action danger"
+                  aria-label="删除"
+                  title="删除"
                   onClick={() => onAskDelete(doc.id, title)}
                 >
-                  删
+                  <Icon name="trash" size={14} />
                 </button>
               </div>
             );

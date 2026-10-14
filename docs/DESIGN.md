@@ -53,7 +53,10 @@
   - 当前目录项：`--accent-soft` 底 + `--accent` 文字，**无左侧竖线**。
 - 过滤框、弹窗输入框：`--surface-raised` / `--canvas` 底，`--line` 边框，聚焦时边框变 `--accent`。
 - 选区工具条：`--toolbar-bg` 黑色胶囊，按钮文字 `--toolbar-ink`，当前状态为白字 + 半透明白底。
-- 标题旁「聚焦」：`--surface-raised` 小胶囊，悬停转 `--accent-soft` 底 + `--accent` 字。
+- 图标：统一用 `src/shared/ui/Icon.tsx`（16 网格、1.5 线宽、`currentColor`），不要用「改 / 删 / + / ▸」这类字符冒充图标。纯图标按钮必须有 `aria-label` 与 `title`（有快捷键时写进 `title`）。
+  - 用图标：新建（加号）、重命名（铅笔）、删除（垃圾桶，悬停才转 `--danger`）、展开折叠（箭头）、聚焦（同心圆）、退出（叉）、全屏 / 退出全屏、高亮。
+  - 保留文字：「正文 / H1–H5」「B」、侧栏底部状态链接（同步、文件夹、更新）、弹窗按钮。
+- 标题旁「聚焦」：`--surface-raised` 圆形图标按钮，悬停转 `--accent-soft` 底 + `--accent` 字。
 - 全屏入口：右上角纯图标按钮，无文字，悬停提示快捷键。
 - 主按钮：`--accent` 黑底白字胶囊，悬停 `--ink-soft`；删除确认用 `--danger` 底。
 - 弹窗：`--surface-raised` 卡片，遮罩 `--overlay` 加轻微模糊，层级高于选区工具条。

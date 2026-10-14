@@ -13,6 +13,7 @@ import { AuthModal } from "@/features/auth/AuthModal";
 import { useAuthStore } from "@/features/auth/authStore";
 import { useSyncStore } from "@/features/sync/syncStore";
 import { ConfirmDialog } from "@/shared/ui/ConfirmDialog";
+import { Icon } from "@/shared/ui/Icon";
 import { downloadDocument } from "@/storage/folder";
 import type { DocumentRecord } from "@/storage/types";
 import { applyBlockLevel, flushPendingSave } from "@/features/editor/editorRegistry";
@@ -276,19 +277,7 @@ export function App() {
               title="全屏（Ctrl+. 或 F11）"
               onClick={() => toggleZen()}
             >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10" />
-              </svg>
+              <Icon name="fullscreen" />
             </button>
           </div>
         ) : null}

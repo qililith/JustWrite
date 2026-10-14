@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { useFocusStore } from "@/features/focus/focusStore";
+import { Icon } from "@/shared/ui/Icon";
 
 type Target = { id: string; title: string; top: number; left: number };
 
@@ -109,6 +110,7 @@ export function HeadingFocusButton({ shellRef }: Props) {
       ref={buttonRef}
       type="button"
       className="heading-focus"
+      aria-label="聚焦本节"
       title={`只看「${target.title}」这一节`}
       style={{ top: target.top, left: target.left }}
       onMouseDown={(event) => event.preventDefault()}
@@ -119,7 +121,7 @@ export function HeadingFocusButton({ shellRef }: Props) {
         setTarget(null);
       }}
     >
-      聚焦
+      <Icon name="focus" size={14} />
     </button>
   );
 }

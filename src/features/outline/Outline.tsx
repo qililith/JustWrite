@@ -4,6 +4,7 @@ import { useOutlineStore } from "./outlineStore";
 import type { OutlineItem } from "./extractOutline";
 import { useFocusStore } from "@/features/focus/focusStore";
 import { jumpToHeading } from "@/features/editor/editorRegistry";
+import { Icon } from "@/shared/ui/Icon";
 
 function visibleItems(
   items: OutlineItem[],
@@ -112,13 +113,18 @@ export function Outline({ onJump }: Props) {
                     {children ? (
                       <button
                         type="button"
-                        className="ghost"
+                        className="outline-toggle"
+                        aria-label={collapsed[item.id] ? "展开" : "折叠"}
+                        aria-expanded={!collapsed[item.id]}
                         onClick={() => toggleCollapsed(item.id)}
                       >
-                        {collapsed[item.id] ? "▸" : "▾"}
+                        <Icon
+                          name={collapsed[item.id] ? "chevron-right" : "chevron-down"}
+                          size={12}
+                        />
                       </button>
                     ) : (
-                      <span className="ghost">·</span>
+                      <span className="outline-toggle is-leaf" aria-hidden="true" />
                     )}
                     <button
                       type="button"
@@ -131,9 +137,11 @@ export function Outline({ onJump }: Props) {
                     <button
                       type="button"
                       className="item-action"
+                      aria-label="聚焦本节"
+                      title={`只看「${item.text}」这一节`}
                       onClick={() => setFocus(item.id, item.text)}
                     >
-                      聚焦
+                      <Icon name="focus" size={14} />
                     </button>
                   </div>
                 </div>

@@ -1,5 +1,6 @@
 import type { Editor } from "@tiptap/react";
 import { BubbleMenu } from "@tiptap/react";
+import { Icon } from "@/shared/ui/Icon";
 
 const LEVELS = [1, 2, 3, 4, 5] as const;
 
@@ -41,17 +42,21 @@ export function BubbleBar({ editor }: Props) {
       <span className="sep" />
       <button
         type="button"
-        className={editor.isActive("bold") ? "is-on" : ""}
+        className={`bubble-bold${editor.isActive("bold") ? " is-on" : ""}`}
+        aria-label="加粗"
+        title="加粗（Ctrl+B）"
         onClick={() => editor.chain().focus().toggleBold().run()}
       >
         B
       </button>
       <button
         type="button"
-        className={editor.isActive("highlight") ? "is-on" : ""}
+        className={`bubble-icon${editor.isActive("highlight") ? " is-on" : ""}`}
+        aria-label="高亮"
+        title="高亮"
         onClick={() => editor.chain().focus().toggleHighlight().run()}
       >
-        高亮
+        <Icon name="highlight" />
       </button>
     </BubbleMenu>
   );

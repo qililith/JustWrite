@@ -3,6 +3,7 @@ import { useZenStore } from "./zenStore";
 import { useFocusStore } from "@/features/focus/focusStore";
 import { Outline } from "@/features/outline/Outline";
 import { WordCount } from "@/features/word-count/WordCount";
+import { Icon } from "@/shared/ui/Icon";
 
 export function ZenHotspots() {
   const isZen = useZenStore((s) => s.isZen);
@@ -19,12 +20,23 @@ export function ZenHotspots() {
       <div className="zen-hotspot top">
         <div className="zen-strip">
           {focusId ? (
-            <button type="button" onClick={() => setFocus(null)}>
-              退出聚焦{focusTitle ? ` · ${focusTitle}` : ""}
+            <button
+              type="button"
+              aria-label="退出聚焦"
+              title="退出聚焦（Esc）"
+              onClick={() => setFocus(null)}
+            >
+              <Icon name="close" size={14} />
+              <span>{focusTitle || "本节"}</span>
             </button>
           ) : null}
-          <button type="button" onClick={() => setZen(false)}>
-            退出全屏
+          <button
+            type="button"
+            aria-label="退出全屏"
+            title="退出全屏（Esc）"
+            onClick={() => setZen(false)}
+          >
+            <Icon name="exit-fullscreen" />
           </button>
         </div>
       </div>
