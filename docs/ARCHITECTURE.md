@@ -73,7 +73,7 @@ text marks   → bold | highlight
 
 ## 存储
 
-- IndexedDB 库名 `changwen`，store：`documents`、`meta`
+- IndexedDB 库名 `justwrite`，store：`documents`、`meta`。首次打开时若还存在旧库 `changwen`，会把文稿和 meta 复制过来再删掉旧库。
 - `documents` 以 `id` 为 key
 - `meta` 键 `workspace`：`{ lastOpenId, lastPulledAt }`
 - `meta` 键 `folderHandle`：`FileSystemDirectoryHandle`

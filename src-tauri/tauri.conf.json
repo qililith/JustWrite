@@ -1,9 +1,9 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "长文",
-  "mainBinaryName": "changwen",
-  "version": "0.1.0",
-  "identifier": "app.changwen.desktop",
+  "productName": "写文章",
+  "mainBinaryName": "justwrite",
+  "version": "../package.json",
+  "identifier": "app.justwrite.desktop",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:5173",
@@ -14,7 +14,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "长文",
+        "title": "写文章",
         "width": 1280,
         "height": 820,
         "minWidth": 900,
@@ -32,8 +32,9 @@
   "bundle": {
     "active": true,
     "targets": ["nsis"],
+    "createUpdaterArtifacts": true,
     "publisher": "qililith",
-    "shortDescription": "长文写作",
+    "shortDescription": "写文章",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -46,6 +47,15 @@
         "installMode": "currentUser",
         "languages": ["SimpChinese"],
         "displayLanguageSelector": false
+      }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEE5QjYzNjg1MjlFRjEwOEIKUldTTEVPOHBoVGEycVR6ako2Wlo0RFdFRjV0bHBlYlU2V1VpSGlNR0J5aE1iQVRBUXBxRUxvK2MK",
+      "endpoints": ["https://changwen-updates.pages.dev/latest.json"],
+      "windows": {
+        "installMode": "passive"
       }
     }
   }

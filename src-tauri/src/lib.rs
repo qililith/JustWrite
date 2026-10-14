@@ -47,8 +47,41 @@ fn folder_remove(root: String, rel: String) -> Result<(), String> {
   }
 }
 
+/// 应用标识从 `app.changwen.desktop` 改为 `app.justwrite.desktop` 后，
+/// 第一次启动把旧数据目录整份复制过来，避免本地文稿留在旧目录。
+fn migrate_legacy_profile() {
+  const LEGACY: &str = "app.changwen.desktop";
+  const CURRENT: &str = "app.justwrite.desktop";
+  for key in ["APPDATA", "LOCALAPPDATA"] {
+    let Ok(root) = std::env::var(key) else { continue };
+    let from = Path::new(&root).join(LEGACY);
+    let to = Path::new(&root).join(CURRENT);
+    if to.exists() || !from.is_dir() {
+      continue;
+    }
+    if copy_dir_all(&from, &to).is_err() {
+      let _ = std::fs::remove_dir_all(&to);
+    }
+  }
+}
+
+fn copy_dir_all(from: &Path, to: &Path) -> std::io::Result<()> {
+  std::fs::create_dir_all(to)?;
+  for entry in std::fs::read_dir(from)? {
+    let entry = entry?;
+    let dest = to.join(entry.file_name());
+    if entry.file_type()?.is_dir() {
+      copy_dir_all(&entry.path(), &dest)?;
+    } else {
+      std::fs::copy(entry.path(), dest)?;
+    }
+  }
+  Ok(())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+  migrate_legacy_profile();
   tauri::Builder::default()
     .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
       if let Some(window) = app.get_webview_window("main") {
@@ -63,6 +96,7 @@ pub fn run() {
         .build(),
     )
     .plugin(tauri_plugin_dialog::init())
+    .plugin(tauri_plugin_updater::Builder::new().build())
     .invoke_handler(tauri::generate_handler![folder_exists, folder_write, folder_remove])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

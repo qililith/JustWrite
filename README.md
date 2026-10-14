@@ -1,6 +1,6 @@
-# 长文
+# 写文章
 
-连续滚动的长文写作工具。左侧是文档列表与长目录，中间是正文；选中文字即可设标题层级、加粗、高亮；可从目录或标题聚焦某一节；一键进入无干扰全屏；登录后可在多设备同步。
+英文名 JustWrite。连续滚动的写作工具。左侧是文档列表与长目录，中间是正文；选中文字即可设标题层级、加粗、高亮；可从目录或标题聚焦某一节；一键进入无干扰全屏；登录后可在多设备同步。
 
 本 README 是跨模型开发的**唯一入口**。改代码前先读完本文和 `docs/`，再对照 `docs/TASKS.md` 验收。
 
@@ -61,7 +61,7 @@ npm run preview
 
 ### 部署（Cloudflare Pages）
 
-线上地址：<https://longform-editor.pages.dev>（Pages 项目名 `longform-editor`，生产分支 `main`）。
+线上地址：<https://justwrite.pages.dev>（Pages 项目名 `justwrite`，生产分支 `main`）。
 
 ```bash
 npx wrangler login   # 首次
@@ -78,7 +78,7 @@ npm run deploy       # 构建并上传 dist
 
 ```bash
 npm run desktop:dev     # 开发：起 Vite 并打开桌面窗口
-npm run desktop:build   # 打包：src-tauri/target/release/bundle/nsis/长文_*_x64-setup.exe
+npm run desktop:build   # 打包：src-tauri/target/release/bundle/nsis/写文章_*_x64-setup.exe
 ```
 
 与网页版的差别只在 `src/platform/desktop.ts` 这一层：
@@ -88,6 +88,23 @@ npm run desktop:build   # 打包：src-tauri/target/release/bundle/nsis/长文_*
 - 无干扰全屏用窗口原生全屏，没有浏览器提示条，Esc 分层完全由应用控制。
 - 关窗前先写入尚未保存的正文；只允许运行一个实例。
 - 中文字体走 Google Fonts，离线时回退到系统黑体。
+- 启动 3 秒后静默检查更新；有新版本时侧栏底部出现「新版本 x.y.z · 重启更新」。
+
+### 发布新版本
+
+版本号只在 `package.json` 里改（`tauri.conf.json` 的 `version` 指向它）。不要手改，用发布命令：
+
+```bash
+$env:HTTPS_PROXY='http://127.0.0.1:7897'   # 需要代理时
+npm run release            # 0.1.0 → 0.1.1
+npm run release -- minor   # 0.1.x → 0.2.0
+```
+
+`scripts/release.mjs` 依次：检查工作区干净且在 `main` → `npm version`（提交并打 `vX.Y.Z` 标签）→ `npm run deploy`（网页）→ 签名打包桌面安装包 → 把安装包与 `latest.json` 部署到 Cloudflare Pages 项目 `changwen-updates`（自动更新源）→ `git push --follow-tags` → `gh release create`（GitHub Release，留存安装包与更新说明，说明取自上个标签以来的提交标题）。
+
+- 更新签名私钥在 `~/.tauri/changwen.key`，**不进仓库，务必备份**。丢了它，已安装的桌面版就再也收不到更新，只能手动重装。
+- 更新源放在 Cloudflare 而不是 GitHub Releases：仓库是私有的，Releases 文件需要登录才能下载。
+- 已安装的桌面版点「重启更新」后，安装器以 passive 模式覆盖安装并重启应用；文稿在应用数据目录，不受影响。
 
 ## 技术栈
 

@@ -16,7 +16,13 @@ import { ConfirmDialog } from "@/shared/ui/ConfirmDialog";
 import { downloadDocument } from "@/storage/folder";
 import type { DocumentRecord } from "@/storage/types";
 import { applyBlockLevel, flushPendingSave } from "@/features/editor/editorRegistry";
-import { isDesktop, onWindowClose, onWindowFullscreenChange } from "@/platform/desktop";
+import {
+  checkDesktopUpdate,
+  isDesktop,
+  onWindowClose,
+  onWindowFullscreenChange,
+  type DesktopUpdate,
+} from "@/platform/desktop";
 
 export function App() {
   const ready = useWorkspaceStore((s) => s.ready);
@@ -40,6 +46,29 @@ export function App() {
   const idleTimer = useRef<number | null>(null);
   const scrollFrame = useRef(0);
   const [pendingDelete, setPendingDelete] = useState<{ id: string; title: string } | null>(null);
+  const [update, setUpdate] = useState<DesktopUpdate | null>(null);
+  const [updating, setUpdating] = useState(false);
+
+  useEffect(() => {
+    if (!isDesktop()) return;
+    const timer = window.setTimeout(() => {
+      checkDesktopUpdate().then(setUpdate, () => undefined);
+    }, 3000);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  const installUpdate = async () => {
+    if (!update || updating) return;
+    setUpdating(true);
+    try {
+      await flushPendingSave();
+      await update.install();
+    } catch (error) {
+      console.error(error);
+      setUpdating(false);
+      window.alert(`更新失败：${(error as Error).message ?? error}`);
+    }
+  };
 
   useEffect(() => {
     void hydrate();
@@ -148,7 +177,7 @@ export function App() {
   const importDocument = async (file: File) => {
     try {
       const parsed = JSON.parse(await file.text()) as Partial<DocumentRecord>;
-      if (parsed.content?.type !== "doc") throw new Error("不是长文导出的文档");
+      if (parsed.content?.type !== "doc") throw new Error("不是写文章导出的文档");
       await useWorkspaceStore.getState().importDocument(parsed.title ?? "", parsed.content);
     } catch (error) {
       window.alert(`导入失败：${(error as Error).message}`);
@@ -167,7 +196,7 @@ export function App() {
     <div className="app">
       <aside className="app-sidebar">
         <div className="sidebar-header">
-          <div className="brand">长文</div>
+          <div className="brand">写文章</div>
         </div>
         <DocumentList
           onAskDelete={(id, title) => setPendingDelete({ id, title })}
@@ -175,6 +204,11 @@ export function App() {
         <div className="section-label">目录</div>
         <Outline />
         <div className="sidebar-footer">
+          {update ? (
+            <button type="button" className="linkish" onClick={() => void installUpdate()}>
+              {updating ? "正在更新…" : `新版本 ${update.version} · 重启更新`}
+            </button>
+          ) : null}
           {folder.supported ? (
             folder.needsPermission ? (
               isDesktop() ? (

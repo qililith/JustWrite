@@ -1,7 +1,7 @@
 import { openDB, type DBSchema, type IDBPDatabase } from "idb";
 import type { DocumentRecord, WorkspaceMeta } from "./types";
 
-interface ChangwenDB extends DBSchema {
+interface JustWriteDB extends DBSchema {
   documents: {
     key: string;
     value: DocumentRecord;
@@ -12,14 +12,64 @@ interface ChangwenDB extends DBSchema {
   };
 }
 
-const DB_NAME = "changwen";
+const DB_NAME = "justwrite";
+const LEGACY_DB_NAME = "changwen";
 const DB_VERSION = 1;
+
+function upgradeStores(db: IDBPDatabase<JustWriteDB>) {
+  if (!db.objectStoreNames.contains("documents")) {
+    db.createObjectStore("documents", { keyPath: "id" });
+  }
+  if (!db.objectStoreNames.contains("meta")) {
+    db.createObjectStore("meta");
+  }
+}
+
+/** 把旧库名里的文稿拷到 `justwrite`，成功后再删旧库。 */
+async function migrateLegacyDatabase(): Promise<void> {
+  if (typeof indexedDB.databases !== "function") return;
+  const listed = await indexedDB.databases();
+  if (!listed.some((entry) => entry.name === LEGACY_DB_NAME)) return;
+
+  const legacy = await openDB<JustWriteDB>(LEGACY_DB_NAME, DB_VERSION);
+  const documents = await legacy.getAll("documents");
+  const metaKeys = await legacy.getAllKeys("meta");
+  const metaEntries = await Promise.all(
+    metaKeys.map(async (key) => [key, await legacy.get("meta", key)] as const),
+  );
+  legacy.close();
+
+  if (documents.length === 0 && metaEntries.length === 0) {
+    indexedDB.deleteDatabase(LEGACY_DB_NAME);
+    return;
+  }
+
+  if (listed.some((entry) => entry.name === DB_NAME)) {
+    const current = await openDB<JustWriteDB>(DB_NAME, DB_VERSION);
+    const count = await current.count("documents");
+    current.close();
+    if (count > 0) return;
+  }
+
+  const next = await openDB<JustWriteDB>(DB_NAME, DB_VERSION, { upgrade: upgradeStores });
+  const tx = next.transaction(["documents", "meta"], "readwrite");
+  await Promise.all([
+    ...documents.map((doc) => tx.objectStore("documents").put(doc)),
+    ...metaEntries.map(([key, value]) => {
+      if (value === undefined) return Promise.resolve();
+      return tx.objectStore("meta").put(value, key);
+    }),
+    tx.done,
+  ]);
+  next.close();
+  indexedDB.deleteDatabase(LEGACY_DB_NAME);
+}
 
 const memoryDocs = new Map<string, DocumentRecord>();
 let memoryMeta: WorkspaceMeta = { lastOpenId: null };
 let memoryHandle: FileSystemDirectoryHandle | null = null;
 let useMemory = false;
-let dbPromise: Promise<IDBPDatabase<ChangwenDB>> | null = null;
+let dbPromise: Promise<IDBPDatabase<JustWriteDB>> | null = null;
 
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   return new Promise((resolve, reject) => {
@@ -40,16 +90,9 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
 async function getDb() {
   if (useMemory) throw new Error("memory-only");
   if (!dbPromise) {
-    dbPromise = openDB<ChangwenDB>(DB_NAME, DB_VERSION, {
-      upgrade(db) {
-        if (!db.objectStoreNames.contains("documents")) {
-          db.createObjectStore("documents", { keyPath: "id" });
-        }
-        if (!db.objectStoreNames.contains("meta")) {
-          db.createObjectStore("meta");
-        }
-      },
-    });
+    dbPromise = migrateLegacyDatabase().then(() =>
+      openDB<JustWriteDB>(DB_NAME, DB_VERSION, { upgrade: upgradeStores }),
+    );
   }
   return withTimeout(dbPromise, 2000);
 }

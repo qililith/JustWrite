@@ -1,4 +1,4 @@
--- 长文：文档表与 RLS。在 Supabase SQL Editor 执行本文件。
+-- 写文章（JustWrite）：文档表与 RLS。在 Supabase SQL Editor 执行本文件。
 
 create table if not exists public.documents (
   id uuid primary key,

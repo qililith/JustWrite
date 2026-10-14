@@ -35,7 +35,8 @@ TipTap 只允许：
 ## 桌面版
 
 - 网页版与桌面版共用同一套前端。桌面差异只经 `src/platform/desktop.ts` 的 `isDesktop()` 分支，`@tauri-apps/*` 只能在 `src/platform/` 里 import（且用动态 import）。
-- 桌面版不加网页版没有的功能。
+- 桌面版不加网页版没有的功能（自动更新属于发布机制，不算功能）。
+- 版本号只在 `package.json`；发布只用 `npm run release`，不要手改版本号或手动打标签。
 - Rust 写盘命令只允许 `manifest.json` 与 `docs/{id}.json`，不要放宽成任意路径。
 - 改动后网页版 `npm run build` 必须照常通过、线上行为不变。
 

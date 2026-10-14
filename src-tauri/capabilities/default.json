@@ -1,12 +1,13 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "长文主窗口权限",
+  "description": "写文章主窗口权限",
   "windows": ["main"],
   "permissions": [
     "core:default",
     "core:window:allow-set-fullscreen",
     "core:window:allow-destroy",
-    "dialog:allow-open"
+    "dialog:allow-open",
+    "updater:default"
   ]
 }

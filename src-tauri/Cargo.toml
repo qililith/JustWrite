@@ -1,15 +1,15 @@
 [package]
-name = "changwen"
+name = "justwrite"
 version = "0.1.0"
-description = "长文：本地优先的长文写作编辑器"
+description = "写文章（JustWrite）：本地优先的写作编辑器"
 authors = ["qililith"]
 license = ""
-repository = "https://github.com/qililith/longform-editor"
+repository = "https://github.com/qililith/JustWrite"
 edition = "2021"
 rust-version = "1.80"
 
 [lib]
-name = "changwen_lib"
+name = "justwrite_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
@@ -21,6 +21,7 @@ serde_json = "1.0"
 tauri = { version = "2", features = [] }
 tauri-plugin-dialog = "2"
 tauri-plugin-single-instance = "2"
+tauri-plugin-updater = "2"
 tauri-plugin-window-state = "2"
 
 [profile.release]

@@ -23,6 +23,19 @@ export async function desktopFolderRemove(root: string, rel: string) {
   await invoke("folder_remove", { root, rel });
 }
 
+export type DesktopUpdate = {
+  version: string;
+  install: () => Promise<void>;
+};
+
+/** 查询更新源；没有新版本或离线时返回 null。安装时 Windows 会退出应用并由安装器重启。 */
+export async function checkDesktopUpdate(): Promise<DesktopUpdate | null> {
+  const { check } = await import("@tauri-apps/plugin-updater");
+  const update = await check();
+  if (!update) return null;
+  return { version: update.version, install: () => update.downloadAndInstall() };
+}
+
 export async function setWindowFullscreen(value: boolean) {
   const { getCurrentWindow } = await import("@tauri-apps/api/window");
   await getCurrentWindow().setFullscreen(value);
