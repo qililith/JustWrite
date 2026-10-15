@@ -105,6 +105,7 @@ text marks   → bold | highlight
 | Ctrl+Alt+1..5 | 标题层级 |
 | Ctrl+Alt+0 | 正文 |
 | Ctrl+. / F11 | 切换无干扰全屏 |
+| Ctrl+\ | 收起 / 展开侧栏（全屏时无效） |
 | Esc | 工具条 → 聚焦 → 全屏 |
 
 ## 模块边界

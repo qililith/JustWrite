@@ -50,6 +50,14 @@
   font-size: 12px;
 }
 
+.app.is-sidebar-closed {
+  grid-template-columns: 0 1fr;
+}
+
+.app.is-sidebar-closed .app-sidebar {
+  display: none;
+}
+
 html[data-zen="true"] .app {
   grid-template-columns: 1fr;
 }
@@ -105,7 +113,7 @@ html[data-zen="true"] .ProseMirror {
   padding: 0;
 }
 
-.zen-entry {
+.toolbar-btn {
   display: grid;
   place-items: center;
   width: 32px;
@@ -233,12 +241,17 @@ html[data-zen="true"] .ProseMirror {
 
 .editor-toolbar {
   position: sticky;
-  float: right;
+  top: 0;
   z-index: 5;
-  top: 16px;
-  right: 20px;
+  height: 0;
   display: flex;
-  gap: 8px;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+.editor-toolbar > button {
+  margin-top: 16px;
 }
 
 .bubble-bar {

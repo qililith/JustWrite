@@ -25,6 +25,8 @@ import {
   type DesktopUpdate,
 } from "@/platform/desktop";
 
+const SIDEBAR_KEY = "justwrite.sidebar";
+
 export function App() {
   const ready = useWorkspaceStore((s) => s.ready);
   const hydrate = useWorkspaceStore((s) => s.hydrate);
@@ -49,6 +51,13 @@ export function App() {
   const [pendingDelete, setPendingDelete] = useState<{ id: string; title: string } | null>(null);
   const [update, setUpdate] = useState<DesktopUpdate | null>(null);
   const [updating, setUpdating] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(
+    () => localStorage.getItem(SIDEBAR_KEY) !== "closed",
+  );
+
+  useEffect(() => {
+    localStorage.setItem(SIDEBAR_KEY, sidebarOpen ? "open" : "closed");
+  }, [sidebarOpen]);
 
   useEffect(() => {
     if (!isDesktop()) return;
@@ -125,6 +134,11 @@ export function App() {
         toggleZen();
         return;
       }
+      if (event.ctrlKey && event.key === "\\") {
+        event.preventDefault();
+        if (!useZenStore.getState().isZen) setSidebarOpen((open) => !open);
+        return;
+      }
       if (event.ctrlKey && event.altKey && /^[0-5]$/.test(event.key)) {
         event.preventDefault();
         applyBlockLevel(Number(event.key));
@@ -194,7 +208,7 @@ export function App() {
   }
 
   return (
-    <div className="app">
+    <div className={sidebarOpen ? "app" : "app is-sidebar-closed"}>
       <aside className="app-sidebar">
         <div className="sidebar-header">
           <div className="brand">写文章</div>
@@ -272,7 +286,17 @@ export function App() {
           <div className="editor-toolbar">
             <button
               type="button"
-              className="icon-btn zen-entry"
+              className="icon-btn toolbar-btn"
+              aria-label={sidebarOpen ? "收起侧栏" : "展开侧栏"}
+              aria-expanded={sidebarOpen}
+              title={sidebarOpen ? "收起侧栏（Ctrl+\\）" : "展开侧栏（Ctrl+\\）"}
+              onClick={() => setSidebarOpen((open) => !open)}
+            >
+              <Icon name="sidebar" />
+            </button>
+            <button
+              type="button"
+              className="icon-btn toolbar-btn zen-entry"
               aria-label="全屏"
               title="全屏（Ctrl+. 或 F11）"
               onClick={() => toggleZen()}

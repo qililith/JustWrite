@@ -10,7 +10,8 @@ export type IconName =
   | "close"
   | "fullscreen"
   | "exit-fullscreen"
-  | "highlight";
+  | "highlight"
+  | "sidebar";
 
 const SHAPES: Record<IconName, ReactNode> = {
   plus: <path d="M8 3.25v9.5M3.25 8h9.5" />,
@@ -43,6 +44,12 @@ const SHAPES: Record<IconName, ReactNode> = {
     <>
       <path d="M4.75 10 8 2.75 11.25 10M5.9 7.5h4.2" />
       <rect x="3" y="12" width="10" height="2" rx="1" fill="var(--highlight)" stroke="none" />
+    </>
+  ),
+  sidebar: (
+    <>
+      <rect x="2.25" y="3" width="11.5" height="10" rx="2" />
+      <path d="M6.25 3v10" />
     </>
   ),
 };
