@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>写文章 · 问题与解法</title>
+  <style>
+    :root {
+      --canvas: #ffffff;
+      --surface: #f3f3f3;
+      --ink: #111111;
+      --soft: #2e2e2e;
+      --muted: #8c8c8c;
+      --line: #e6e6e6;
+      --highlight: #fff1a8;
+      --hover: rgba(0, 0, 0, 0.04);
+      --measure: 42rem;
+      --font: "Source Sans 3", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      color: var(--soft);
+      background: var(--surface);
+      line-height: 1.75;
+    }
+    a { color: inherit; }
+    button, a { font-family: inherit; }
+
+    .top {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 28px;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+    }
+    .brand {
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      text-decoration: none;
+    }
+    .brand small {
+      display: block;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      font-size: 11px;
+    }
+    .spacer { flex: 1; }
+    .modes { display: flex; gap: 4px; background: var(--surface); padding: 4px; border-radius: 999px; }
+    .modes button {
+      border: 0;
+      background: transparent;
+      color: var(--soft);
+      padding: 6px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+    .modes button[aria-pressed="true"] {
+      background: var(--ink);
+      color: #fff;
+    }
+    .gh {
+      color: var(--ink);
+      font-weight: 600;
+      text-decoration: none;
+      border-bottom: 1px solid var(--ink);
+    }
+
+    .essay { max-width: calc(var(--measure) + 8rem); margin: 0 auto; padding: 48px 28px 96px; }
+    .kicker {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 13px;
+      letter-spacing: 0.12em;
+    }
+    h1 {
+      margin: 0 0 12px;
+      color: var(--ink);
+      font-size: clamp(2rem, 4vw, 3.1rem);
+      line-height: 1.2;
+      letter-spacing: -0.03em;
+      font-weight: 700;
+    }
+    .lede { margin: 0 0 28px; font-size: 1.15rem; max-width: var(--measure); }
+
+    .brief {
+      background: var(--highlight);
+      color: var(--ink);
+      padding: 28px 28px 20px;
+      border-radius: 16px;
+      max-width: var(--measure);
+    }
+    .brief p { margin: 0; font-size: 1.2rem; line-height: 1.7; }
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 16px;
+      color: var(--soft);
+      font-size: 13px;
+    }
+    .copy {
+      border: 0;
+      background: transparent;
+      color: var(--ink);
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      padding: 0;
+    }
+
+    h2 {
+      margin: 56px 0 8px;
+      color: var(--ink);
+      font-size: 1.55rem;
+      letter-spacing: -0.02em;
+    }
+    .section-label { color: var(--muted); font-size: 13px; letter-spacing: 0.14em; margin: 48px 0 0; }
+
+    .pairs { display: grid; gap: 10px; max-width: var(--measure); margin-top: 16px; }
+    .pair {
+      display: grid;
+      grid-template-columns: 1fr 28px 1.2fr;
+      gap: 12px;
+      align-items: stretch;
+      background: var(--canvas);
+      border-radius: 12px;
+      padding: 16px 18px;
+    }
+    .pair b { display: block; color: var(--ink); font-weight: 650; margin-bottom: 4px; }
+    .pair span { color: var(--muted); font-size: 0.95rem; }
+    .arrow { align-self: center; color: var(--ink); font-size: 1.2rem; }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      max-width: var(--measure);
+      margin-top: 16px;
+    }
+    .flow div {
+      background: var(--canvas);
+      border-radius: 12px;
+      padding: 16px;
+      min-height: 132px;
+    }
+    .flow strong { display: block; color: var(--ink); margin: 8px 0 6px; }
+    .flow em { font-style: normal; color: var(--muted); font-size: 12px; letter-spacing: 0.08em; }
+    .flow p { margin: 0; font-size: 0.92rem; }
+
+    article p { max-width: var(--measure); font-size: 1.06rem; }
+    .countline { color: var(--muted); font-size: 13px; }
+
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px 28px;
+      margin-top: 12px;
+    }
+    .links a {
+      color: var(--ink);
+      font-weight: 650;
+      text-decoration: none;
+      border-bottom: 1px solid var(--ink);
+    }
+    .links small { display: block; color: var(--muted); font-weight: 500; margin-top: 4px; }
+
+.deck { display: none; position: relative; background: var(--canvas); min-height: 0; }
+body[data-view="slides"] {
+  background: var(--canvas);
+  height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+body[data-view="slides"] .top { flex: none; }
+body[data-view="slides"] .essay { display: none; }
+body[data-view="slides"] .deck { display: block; flex: 1; }
+#slides { height: 100%; }
+
+    .slide {
+      display: none;
+      height: 100%;
+      padding: 7vh 8vw 12vh;
+      overflow: auto;
+    }
+    .slide.active { display: flex; flex-direction: column; justify-content: center; }
+    .slide.cover {
+      background: #111;
+      color: #f5f5f5;
+    }
+    .slide.cover h2 {
+      color: #fff;
+      font-size: clamp(3rem, 7vw, 5.5rem);
+      line-height: 1.05;
+      margin: 0 0 16px;
+      letter-spacing: -0.04em;
+    }
+.slide.cover p { max-width: 40rem; font-size: 1.35rem; color: #cfcfcf; }
+.slide.cover a { color: var(--highlight); overflow-wrap: anywhere; }
+    .slide h2 { font-size: clamp(1.8rem, 3vw, 2.6rem); margin: 0 0 18px; }
+    .slide .body { max-width: 46rem; font-size: clamp(1.05rem, 1.6vw, 1.28rem); line-height: 1.65; }
+    .slide .idx { color: var(--muted); letter-spacing: 0.14em; font-size: 13px; margin-bottom: 10px; }
+
+    .nav {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 8vw 22px;
+      background: linear-gradient(transparent, #fff 40%);
+    }
+    .slide.cover ~ .nav, body[data-view="slides"] .nav.over-cover {
+      background: linear-gradient(transparent, #111 45%);
+      color: #fff;
+    }
+    .nav button {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 8px 16px;
+      cursor: pointer;
+    }
+    .nav button:disabled { opacity: 0.35; cursor: default; }
+    .dots { display: flex; gap: 6px; margin-left: 8px; }
+    .dots button {
+      width: 8px; height: 8px; padding: 0;
+      border-radius: 99px;
+      border: 0;
+      background: #ccc;
+    }
+    .dots button[aria-current="true"] { background: var(--ink); width: 22px; }
+    .progress { margin-left: auto; color: var(--muted); font-size: 13px; }
+
+    @media (max-width: 800px) {
+      .pair { grid-template-columns: 1fr; }
+      .arrow { display: none; }
+      .flow { grid-template-columns: 1fr 1fr; }
+      .top { padding: 12px 16px; }
+      .gh { display: none; }
+    }
+    @media print {
+      .top, .deck, .copy { display: none !important; }
+      body { background: #fff; }
+      .essay { padding-top: 0; }
+    }
+  </style>
+</head>
+<body data-view="article">
+  <header class="top">
+    <a class="brand" href="https://github.com/qililith/JustWrite" target="_blank" rel="noreferrer">
+      写文章
+      <small>JUSTWRITE</small>
+    </a>
+    <div class="spacer"></div>
+    <div class="modes" role="tablist" aria-label="呈现方式">
+      <button type="button" id="tab-article" role="tab" aria-pressed="true">文章</button>
+      <button type="button" id="tab-slides" role="tab" aria-pressed="false">幻灯片</button>
+    </div>
+    <a class="gh" href="https://github.com/qililith/JustWrite" target="_blank" rel="noreferrer">GitHub</a>
+  </header>
+
+  <main class="essay" id="essay"></main>
+
+  <section class="deck" id="deck" aria-roledescription="carousel">
+    <div id="slides"></div>
+    <div class="nav" id="nav">
+      <button type="button" id="prev">上一页</button>
+      <button type="button" id="next">下一页</button>
+      <div class="dots" id="dots"></div>
+      <div class="progress" id="progress"></div>
+    </div>
+  </section>
+
+  <script>
+    const repo = "https://github.com/qililith/JustWrite";
+    const live = "https://justwrite-cr0.pages.dev";
+
+    const brief = "长文常被分页、工具栏和协同打断，目录一长难以定位，离线与换设备互相妨碍。写文章（JustWrite）以连续画布写作，选区把整块设为标题并生成虚拟目录。聚焦与全屏只隐藏视图，文稿仍完整。内容先存本机，登录后按最后写入时间，在自己的多台设备间同步。";
+
+    const parts = [
+      {
+        index: "01",
+        kicker: "问题",
+        title: "长文被分页、目录和账号拆开",
+        body: "长文作者要的是连续往下写，并且随时知道自己在哪一节。通用文档软件往往把这件事做成排版：分页线把正文切开，工具栏长期占着屏幕，列表、图片、表格、评论和他人光标一起进入视野。标题一多，目录要么一次渲染几千行而变卡，要么与正文各记一套层级，点击之后对不上位置。只想看当前章节时，常见做法是删去其余段落或另存一篇，退出后再把全文拼回来。存储同样绑手：不登录就很难完整地写和存；一旦上云，又常常变成多人同时改同一段，冲突难以预料。网页与桌面若分成两套程序，上述行为还会各自漂移。"
+      },
+      {
+        index: "02",
+        kicker: "做法 · 写作与目录",
+        title: "整块成为标题，标题就是目录",
+        body: "写文章，英文名 JustWrite，把范围收成五件事：连续正文、长目录、章节聚焦、无干扰全屏，以及可选的单人多设备同步。打开之后是白纸黑字，左侧为文档列表和目录，中间是一条不分页的正文。格式只保留正文、一至五级标题、加粗和淡黄高亮。选中文字后设定标题，转换的是整块；一次框选多块，就逐块转换。标题层级与目录层级是同一个字段。标题在创建时生成稳定编号，之后打字、拆段、合并都不更换，目录跳转、当前节和聚焦都靠它对齐。目录只收录标题，可以折叠，可以按文字过滤，点击后平滑滚到该处。当前节由光标和滚动位置共同决定。标题数量上去之后，列表只绘制视口里的行，因此几百以至上千条标题仍能滚动。"
+      },
+      {
+        index: "03",
+        kicker: "做法 · 聚焦与全屏",
+        title: "只改眼前所见，不改文稿",
+        body: "章节聚焦与全屏是两层，可以叠在一起用。聚焦从所选标题算起，直到下一个同级或更高级标题之前，中间更低级的标题仍属于本节。范围以外的块只用样式隐藏，文档里的全文都在，保存、刷新、再次打开都不缺段；此时字数改计本节。中英混排时，汉字各计一字，拉丁文字按空白分词，标点不计。全屏则藏起侧栏和底栏，正文收到大约六百八十像素宽并居中，行距略增。画面上没有常驻按钮。鼠标移到顶边出现退出，移到左边出现临时目录，移到底边出现字数。Esc 由内向外：先关选区工具条，再退出聚焦，最后退出全屏。若由系统直接退出全屏，侧栏和底栏会一起回来。"
+      },
+      {
+        index: "04",
+        kicker: "做法 · 存储与结果",
+        title: "先写在这台电脑里",
+        body: "数据先写入本机数据库。未登录、未绑定文件夹、未配置云服务时，新建、重命名、删除、自动保存、聚焦和全屏都完整可用。若要留在磁盘上，可以绑定一个文件夹，写入清单和每一篇文稿；删除只记下时间，列表里不再显示，同步结束前不把本地记录抹掉。登录邮箱以后，同一账号的其他设备能拉到这些文稿。冲突只比较更新时间，较新的一份保留，本机还没上传的修改优先推上去。这是一个人的多台设备先后对齐。云端有变化时，程序只把它当作信号，重新取回全文并核对之后才放进编辑器。退出登录就停止推送，电脑里的文稿仍留着。网页和 Windows 桌面共用这套界面，桌面只负责选目录、按限定文件名写盘、窗口全屏，以及关窗前写完未保存的字。于是长文可以顺着写、从目录回到某一节、只看这一节，也可以全屏不被打断；文稿先在自己的电脑里，需要时再出现在自己的另一台设备上。"
+      }
+    ];
+
+    const longText = parts.map((p) => p.body).join("\n\n");
+
+    function han(s) {
+      return (s.match(/[\u4e00-\u9fff]/g) || []).length;
+    }
+    function withPunct(s) {
+      return s.replace(/\s/g, "").length;
+    }
+
+    const briefHan = han(brief);
+    const longHan = han(longText);
+
+    const pairs = [
+      ["分页、工具栏、协同光标", "一条不分页的正文，格式只留标题、加粗、高亮"],
+      ["目录一长就卡，或和正文对不上", "稳定标题编号，虚拟列表只画视口内的行"],
+      ["只看一节就要删文或另存", "用样式隐藏范围外的块，保存的仍是全文"],
+      ["不登录难写，上云又变成多人改一段", "先写入本机；登录后按更新时间，在自己的设备间同步"]
+    ];
+
+    const flow = [
+      ["01", "写", "选区把整块设为 H1–H5，并记下稳定编号"],
+      ["02", "找", "目录按编号嵌套、折叠、过滤，并虚拟滚动"],
+      ["03", "看", "聚焦与全屏只改变显示，Esc 由内向外退出"],
+      ["04", "留", "IndexedDB 必写，文件夹与云同步都是后加的"]
+    ];
+
+    function esc(s) {
+      return s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+    }
+
+    document.getElementById("essay").innerHTML = `
+      <p class="kicker">问题与解法 · 百字 / 千字</p>
+      <h1>把长文写作收成一件能连续做完的事</h1>
+      <p class="lede">写文章（JustWrite）是连续滚动的写作工具：左侧文档与长目录，中间正文。下面先给约一百字的压缩陈述，再给约一千字的展开，并配上问题与做法的对照。</p>
+      <section class="brief" id="brief-block">
+        <p>${esc(brief)}</p>
+        <div class="meta">
+          <span>百字 · 汉字 ${briefHan} · 含标点 ${withPunct(brief)}</span>
+          <button class="copy" type="button" data-copy="brief">复制百字</button>
+        </div>
+      </section>
+
+      <p class="section-label">对照</p>
+      <h2>四件具体的事，各有一个做法</h2>
+      <div class="pairs">
+        ${pairs.map(([q, a]) => `<div class="pair"><div><b>问题</b><span>${esc(q)}</span></div><div class="arrow">→</div><div><b>做法</b><span>${esc(a)}</span></div></div>`).join("")}
+      </div>
+
+      <div class="flow">
+        ${flow.map(([n, t, d]) => `<div><em>${n}</em><strong>${t}</strong><p>${esc(d)}</p></div>`).join("")}
+      </div>
+
+      <p class="section-label">千字</p>
+      <h2>拓展陈述</h2>
+      <p class="countline">四段正文合计汉字 ${longHan}，含标点 ${withPunct(longText)}。<button class="copy" type="button" data-copy="long">复制千字</button></p>
+      ${parts.map((p) => `<p class="section-label">${p.index} ${esc(p.kicker)}</p><h2>${esc(p.title)}</h2><p>${esc(p.body)}</p>`).join("")}
+
+      <p class="section-label">仓库</p>
+      <h2>GitHub</h2>
+      <div class="links">
+        <a href="${repo}" target="_blank" rel="noreferrer">${repo}<small>源码仓库，公开可访问。</small></a>
+        <a href="${live}" target="_blank" rel="noreferrer">${live}<small>网页版，未登录也可完整写作。</small></a>
+      </div>
+    `;
+
+    const slideModels = [
+      {
+        cover: true,
+        html: `<p class="idx">JUSTWRITE</p><h2>写文章</h2><p>把长文写作收成一件能连续做完的事：连续正文、长目录、章节聚焦、无干扰全屏，以及可选的单人多设备同步。</p><p><a href="${repo}" target="_blank" rel="noreferrer">${repo}</a></p>`
+      },
+      {
+        html: `<p class="idx">问题</p><h2>四件事把写作拆开</h2><div class="pairs">${pairs.map(([q]) => `<div class="pair"><div><b>${esc(q)}</b></div></div>`).join("")}</div>`
+      },
+      {
+        html: `<p class="idx">百字 · 汉字 ${briefHan}</p><h2>压缩陈述</h2><div class="brief"><p>${esc(brief)}</p></div>`
+      },
+      ...parts.map((p) => ({
+        html: `<p class="idx">${p.index}　${esc(p.kicker)} · 本段汉字 ${han(p.body)}</p><h2>${esc(p.title)}</h2><p class="body">${esc(p.body)}</p>`
+      })),
+      {
+        html: `<p class="idx">路径</p><h2>从一次输入到另一台设备</h2><div class="flow">${flow.map(([n, t, d]) => `<div><em>${n}</em><strong>${esc(t)}</strong><p>${esc(d)}</p></div>`).join("")}</div>`
+      },
+      {
+        cover: true,
+        html: `<p class="idx">仓库 · 千字合计汉字 ${longHan}</p><h2>GitHub</h2><p><a href="${repo}" target="_blank" rel="noreferrer">${repo}</a></p><p>网页版 <a href="${live}" target="_blank" rel="noreferrer">${live}</a></p><p>源码仓库公开可访问。未登录时，本地写作、保存、聚焦和全屏仍然完整。</p>`
+      }
+    ];
+
+    const slidesEl = document.getElementById("slides");
+    slidesEl.innerHTML = slideModels.map((s, i) => `<article class="slide${s.cover ? " cover" : ""}" data-i="${i}" aria-hidden="true">${s.html}</article>`).join("");
+    const dots = document.getElementById("dots");
+    dots.innerHTML = slideModels.map((_, i) => `<button type="button" data-go="${i}" aria-label="第 ${i + 1} 页"></button>`).join("");
+
+    let index = 0;
+    const articles = [...slidesEl.querySelectorAll(".slide")];
+
+    function show(n) {
+      index = Math.max(0, Math.min(slideModels.length - 1, n));
+      articles.forEach((el, i) => {
+        const on = i === index;
+        el.classList.toggle("active", on);
+        el.setAttribute("aria-hidden", on ? "false" : "true");
+      });
+      [...dots.children].forEach((el, i) => {
+  if (i === index) el.setAttribute("aria-current", "true");
+  else el.removeAttribute("aria-current");
+});
+      document.getElementById("progress").textContent = `${index + 1} / ${slideModels.length}`;
+      document.getElementById("prev").disabled = index === 0;
+      document.getElementById("next").disabled = index === slideModels.length - 1;
+      document.getElementById("nav").classList.toggle("over-cover", !!slideModels[index].cover);
+    }
+
+    document.getElementById("prev").onclick = () => show(index - 1);
+    document.getElementById("next").onclick = () => show(index + 1);
+    dots.onclick = (e) => {
+      const go = e.target.getAttribute("data-go");
+      if (go != null) show(Number(go));
+    };
+
+    function setView(view) {
+      document.body.dataset.view = view;
+      document.getElementById("tab-article").setAttribute("aria-pressed", view === "article" ? "true" : "false");
+      document.getElementById("tab-slides").setAttribute("aria-pressed", view === "slides" ? "true" : "false");
+      history.replaceState(null, "", view === "slides" ? "#slides" : "#article");
+      if (view === "slides") show(index);
+    }
+
+    document.getElementById("tab-article").onclick = () => setView("article");
+    document.getElementById("tab-slides").onclick = () => setView("slides");
+
+    document.addEventListener("keydown", (e) => {
+      if (document.body.dataset.view !== "slides") return;
+      if (e.key === "ArrowRight" || e.key === "PageDown") show(index + 1);
+      if (e.key === "ArrowLeft" || e.key === "PageUp") show(index - 1);
+    });
+
+    document.body.addEventListener("click", async (e) => {
+      const btn = e.target.closest("[data-copy]");
+      if (!btn) return;
+      const text = btn.dataset.copy === "brief" ? brief : longText;
+      try {
+        await navigator.clipboard.writeText(text);
+        btn.textContent = "已复制";
+      } catch {
+        btn.textContent = "请手动选择复制";
+      }
+    });
+
+    show(0);
+    if (location.hash === "#slides") setView("slides");
+
+    console.log("brief", briefHan, withPunct(brief));
+    console.log("long", longHan, withPunct(longText));
+    parts.forEach((p) => console.log(p.index, han(p.body)));
+  </script>
+</body>
+</html>
