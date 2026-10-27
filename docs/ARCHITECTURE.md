@@ -106,6 +106,7 @@ text marks   → bold | highlight
 | Ctrl+Alt+0 | 正文 |
 | Ctrl+. / F11 | 切换无干扰全屏 |
 | Ctrl+\ | 收起 / 展开侧栏（全屏时无效） |
+| 两指捏合 / Ctrl+滚轮 | 缩放正文（Ctrl+0 恢复，Ctrl++ / Ctrl+- 步进） |
 | Esc | 工具条 → 聚焦 → 全屏 |
 
 ## 模块边界

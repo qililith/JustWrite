@@ -31,6 +31,7 @@
 --font-sans: "Source Sans 3", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
 --font-heading: var(--font-sans);
 --editor-size: 1.0625rem; /* 正文。40 × 此值 = 一行汉字，见 docs/行长.md */
+--text-zoom: 1;             /* 两指 / Ctrl+滚轮。只缩放正文，不改一行字数 */
 --measure: calc(40 * var(--editor-size));
 --sidebar: 272px;
 ```

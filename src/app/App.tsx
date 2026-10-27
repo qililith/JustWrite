@@ -17,6 +17,7 @@ import { Icon } from "@/shared/ui/Icon";
 import { downloadDocument } from "@/storage/folder";
 import type { DocumentRecord } from "@/storage/types";
 import { applyBlockLevel, flushPendingSave } from "@/features/editor/editorRegistry";
+import { bindTextZoom } from "@/features/editor/textZoom";
 import {
   checkDesktopUpdate,
   isDesktop,
@@ -121,6 +122,8 @@ export function App() {
       window.removeEventListener("keydown", onMove);
     };
   }, []);
+
+  useEffect(() => bindTextZoom(), []);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {

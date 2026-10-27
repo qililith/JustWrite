@@ -238,7 +238,7 @@ html[data-zen="true"] .ProseMirror > :first-child {
 
 .editor-shell {
   --shell-pad-x: 36px;
-  max-width: calc(var(--measure) + var(--shell-pad-x) * 2);
+  max-width: calc(var(--measure) * var(--text-zoom) + var(--shell-pad-x) * 2);
   margin: 0 auto;
   padding: 56px var(--shell-pad-x) 120px;
 }
@@ -308,7 +308,7 @@ html[data-zen="true"] .ProseMirror > :first-child {
   outline: none;
   color: var(--ink-soft);
   caret-color: var(--accent);
-  font-size: var(--editor-size);
+  font-size: calc(var(--editor-size) * var(--text-zoom));
   line-height: 1.8;
   min-height: 60vh;
 }
@@ -331,11 +331,11 @@ html[data-zen="true"] .ProseMirror > :first-child {
   position: relative;
 }
 
-.ProseMirror h1 { font-size: 2rem; letter-spacing: -0.02em; }
-.ProseMirror h2 { font-size: 1.55rem; }
-.ProseMirror h3 { font-size: 1.28rem; }
-.ProseMirror h4 { font-size: 1.12rem; }
-.ProseMirror h5 { font-size: 1rem; color: var(--ink-soft); }
+.ProseMirror h1 { font-size: calc(2rem * var(--text-zoom)); letter-spacing: -0.02em; }
+.ProseMirror h2 { font-size: calc(1.55rem * var(--text-zoom)); }
+.ProseMirror h3 { font-size: calc(1.28rem * var(--text-zoom)); }
+.ProseMirror h4 { font-size: calc(1.12rem * var(--text-zoom)); }
+.ProseMirror h5 { font-size: calc(1rem * var(--text-zoom)); color: var(--ink-soft); }
 
 .ProseMirror strong {
   color: var(--ink);

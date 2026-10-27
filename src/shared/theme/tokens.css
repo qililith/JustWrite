@@ -23,6 +23,7 @@
   --font-sans: "Source Sans 3", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
   --font-heading: var(--font-sans);
   --editor-size: 1.0625rem;
+  --text-zoom: 1;
   --measure: calc(40 * var(--editor-size));
   --sidebar: 272px;
 }
