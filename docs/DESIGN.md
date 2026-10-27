@@ -30,7 +30,8 @@
 --shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 10px 30px rgba(0, 0, 0, 0.08);
 --font-sans: "Source Sans 3", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
 --font-heading: var(--font-sans);
---measure: 680px;
+--editor-size: 1.0625rem; /* 正文。40 × 此值 = 一行汉字，见 docs/行长.md */
+--measure: calc(40 * var(--editor-size));
 --sidebar: 272px;
 ```
 
@@ -67,6 +68,7 @@
 ## Zen
 
 - 画布仍是 `--canvas`（白）。
-- 编辑列居中 `--measure`。
+- 编辑列居中 `--measure`（40 个汉字，与普通模式同一列）。
+- 顶距 `8vh`，第一块不再另加段前距。底部留 `62vh`，只有标题时也能把这一行往上滑。
 - 热区未激活时 `opacity: 0`，不占视觉；激活后为半透明 `--surface-raised` + 背景模糊，160ms 淡入。
 - 光标隐藏用 `html.is-idle { cursor: none }`。

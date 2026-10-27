@@ -65,7 +65,7 @@ text marks   → bold | highlight
 1. `isZen = true`
 2. `document.documentElement.requestFullscreen()`（失败则忽略）
 3. 布局 CSS：`[data-zen] .sidebar, [data-zen] .statusbar { display: none }`
-4. 编辑列居中 `max-width: 680px`
+4. 编辑列居中，宽 `--measure`（40 个汉字）。底部多留空白，短文也可滚动。
 
 监听 `fullscreenchange`：若 `document.fullscreenElement === null` 且 `isZen`，则 `isZen = false`。
 

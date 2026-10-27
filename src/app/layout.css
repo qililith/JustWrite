@@ -74,13 +74,16 @@ html[data-zen="true"] .app-main {
 }
 
 html[data-zen="true"] .editor-shell {
-  max-width: var(--measure);
-  margin: 0 auto;
-  padding-top: 12vh;
+  padding-top: 8vh;
+  padding-bottom: 62vh;
 }
 
 html[data-zen="true"] .ProseMirror {
   line-height: 1.85;
+}
+
+html[data-zen="true"] .ProseMirror > :first-child {
+  margin-top: 0;
 }
 
 .sidebar-header {
@@ -234,9 +237,10 @@ html[data-zen="true"] .ProseMirror {
 }
 
 .editor-shell {
-  max-width: 760px;
+  --shell-pad-x: 36px;
+  max-width: calc(var(--measure) + var(--shell-pad-x) * 2);
   margin: 0 auto;
-  padding: 56px 36px 120px;
+  padding: 56px var(--shell-pad-x) 120px;
 }
 
 .editor-toolbar {
@@ -304,7 +308,7 @@ html[data-zen="true"] .ProseMirror {
   outline: none;
   color: var(--ink-soft);
   caret-color: var(--accent);
-  font-size: 1.0625rem;
+  font-size: var(--editor-size);
   line-height: 1.8;
   min-height: 60vh;
 }
