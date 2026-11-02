@@ -79,7 +79,7 @@ html[data-zen="true"] .editor-shell {
 }
 
 html[data-zen="true"] .ProseMirror {
-  line-height: 1.85;
+  line-height: 1.7;
 }
 
 html[data-zen="true"] .ProseMirror > :first-child {
@@ -309,7 +309,7 @@ html[data-zen="true"] .ProseMirror > :first-child {
   color: var(--ink-soft);
   caret-color: var(--accent);
   font-size: calc(var(--editor-size) * var(--text-zoom));
-  line-height: 1.8;
+  line-height: 1.65;
   min-height: 60vh;
 }
 

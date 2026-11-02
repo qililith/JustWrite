@@ -42,8 +42,8 @@
 
 - 全部用无衬线。标题 `--font-heading`，字重 700，字距约 `-0.015em`（H1 `-0.02em`）。
 - H1 2rem / H2 1.55rem / H3 1.28rem / H4 1.12rem / H5 1rem（H5 用 `--ink-soft`）。
-- 正文 1.0625rem，行高 1.8，颜色 `--ink-soft`；加粗用 `--ink`。
-- 全屏时正文行高 1.85。
+- 正文 1.0625rem，行高 1.65，颜色 `--ink-soft`；加粗用 `--ink`。
+- 全屏时正文行高 1.7。
 
 从 Google Fonts 加载 Source Sans 3 与 Noto Sans SC（400 / 500 / 700）。中文回退系统黑体。
 
