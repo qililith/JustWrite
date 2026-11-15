@@ -67,7 +67,14 @@ export function Outline({ onJump }: Props) {
   }, [activeId, rows, virtualizer]);
 
   const jump = (id: string) => {
-    jumpToHeading(id);
+    const item = items.find((entry) => entry.id === id);
+    const currentFocus = useFocusStore.getState().focusId;
+    if (currentFocus) {
+      // 聚焦态下范围外标题被隐藏，仅滚动无法到达；改为切换聚焦到目标节
+      setFocus(id, item?.text ?? "");
+    } else {
+      jumpToHeading(id);
+    }
     setActiveId(id);
     onJump?.(id);
   };
