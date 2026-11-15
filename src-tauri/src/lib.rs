@@ -1,6 +1,9 @@
 use std::path::{Path, PathBuf};
 
 use tauri::Manager;
+
+#[cfg(windows)]
+mod trackpad;
 use tauri_plugin_window_state::StateFlags;
 
 /// 文件夹里只允许出现 `manifest.json` 与 `docs/{id}.json`。
@@ -98,6 +101,17 @@ pub fn run() {
     .plugin(tauri_plugin_dialog::init())
     .plugin(tauri_plugin_updater::Builder::new().build())
     .invoke_handler(tauri::generate_handler![folder_exists, folder_write, folder_remove])
+    .setup(|app| {
+      #[cfg(windows)]
+      if let Some(window) = app.get_webview_window("main") {
+        let _ = window.with_webview(|webview| unsafe {
+          if let Err(error) = trackpad::install(&webview.controller()) {
+            eprintln!("触控板缩放未接上: {error}");
+          }
+        });
+      }
+      Ok(())
+    })
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }

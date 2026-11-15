@@ -91,7 +91,7 @@ text marks   → bold | highlight
 
 ## 桌面壳
 
-`src-tauri/`：Tauri 2。插件：single-instance（再次启动只聚焦已有窗口）、window-state（记住位置大小，不记全屏）、dialog（目录选择）。关窗走 `onCloseRequested`，先 `flushPendingSave()` 把 400ms debounce 里的正文写完再销毁窗口。非输入区域屏蔽 WebView 默认右键菜单。
+`src-tauri/`：Tauri 2。插件：single-instance（再次启动只聚焦已有窗口）、window-state（记住位置大小，不记全屏）、dialog（目录选择）。关窗走 `onCloseRequested`，先 `flushPendingSave()` 把 400ms debounce 里的正文写完再销毁窗口。非输入区域屏蔽 WebView 默认右键菜单。桌面版触控板捏合不会变成页面滚轮，只改 WebView 的窗口缩放；`trackpad.rs` 把这个比例立刻拨回 1，再交给正文缩放。
 
 ## 标题聚焦入口
 
@@ -106,7 +106,7 @@ text marks   → bold | highlight
 | Ctrl+Alt+0 | 正文 |
 | Ctrl+. / F11 | 切换无干扰全屏 |
 | Ctrl+\ | 收起 / 展开侧栏（全屏时无效） |
-| 两指捏合 / Ctrl+滚轮 | 缩放正文（Ctrl+0 恢复，Ctrl++ / Ctrl+- 步进） |
+| 两指捏合 / Ctrl+滚轮 | 缩放正文。滚轮一格约 3%；Ctrl+0 恢复，Ctrl++ / Ctrl+- 约 4% |
 | Esc | 工具条 → 聚焦 → 全屏 |
 
 ## 模块边界

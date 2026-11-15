@@ -1,3 +1,9 @@
+declare global {
+  interface Window {
+    __justwriteHostZoom?: (factor: number) => void;
+  }
+}
+
 const KEY = "justwrite.textZoom";
 const MIN = 0.75;
 const MAX = 2;
@@ -19,11 +25,19 @@ function distance(touches: TouchList) {
   return Math.hypot(dx, dy);
 }
 
+/** 鼠标滚轮一格在 Windows 上大约是 ±100px；触控板捏合是一串很小的增量。 */
+function factorFromWheel(dy: number) {
+  if (Math.abs(dy) >= 40) return Math.exp(-(dy / 100) * 0.03);
+  return Math.exp(-dy * 0.0025);
+}
+
 /** 触控板捏合与 Ctrl+滚轮缩放正文。比例记在本机，一行字数不变。 */
 export function bindTextZoom() {
   let zoom = readZoom();
   let persist = 0;
   let pinch: { distance: number; zoom: number } | null = null;
+  let wheelAt = 0;
+  let pendingHost = 0;
 
   const apply = (next: number) => {
     zoom = clamp(next);
@@ -34,16 +48,28 @@ export function bindTextZoom() {
 
   apply(zoom);
 
+  // 桌面版触控板捏合会先改 WebView 的窗口缩放。若同一手势没有滚轮事件，就把这个比例折到正文上。
+  window.__justwriteHostZoom = (factor: number) => {
+    if (!Number.isFinite(factor) || Math.abs(factor - 1) < 0.001) return;
+    window.clearTimeout(pendingHost);
+    pendingHost = window.setTimeout(() => {
+      if (performance.now() - wheelAt < 80) return;
+      apply(zoom * factor);
+    }, 0);
+  };
+
   const onWheel = (event: WheelEvent) => {
     if (!event.ctrlKey) return;
     event.preventDefault();
+    wheelAt = performance.now();
+    window.clearTimeout(pendingHost);
     const dy =
       event.deltaMode === WheelEvent.DOM_DELTA_LINE
         ? event.deltaY * 16
         : event.deltaMode === WheelEvent.DOM_DELTA_PAGE
           ? event.deltaY * window.innerHeight
           : event.deltaY;
-    apply(zoom * Math.exp(-dy * 0.0025));
+    apply(zoom * factorFromWheel(dy));
   };
 
   const onKey = (event: KeyboardEvent) => {
@@ -55,12 +81,14 @@ export function bindTextZoom() {
     }
     if (event.key === "+" || event.key === "=") {
       event.preventDefault();
-      apply(zoom * 1.1);
+      wheelAt = performance.now();
+      apply(zoom * 1.04);
       return;
     }
     if (event.key === "-" || event.key === "_") {
       event.preventDefault();
-      apply(zoom / 1.1);
+      wheelAt = performance.now();
+      apply(zoom / 1.04);
     }
   };
 
@@ -89,6 +117,8 @@ export function bindTextZoom() {
 
   return () => {
     window.clearTimeout(persist);
+    window.clearTimeout(pendingHost);
+    delete window.__justwriteHostZoom;
     localStorage.setItem(KEY, String(zoom));
     window.removeEventListener("wheel", onWheel);
     window.removeEventListener("keydown", onKey);
